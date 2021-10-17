@@ -3,9 +3,9 @@ OBJECT Codeunit 50152 dictionary
   OBJECT-PROPERTIES
   {
     Date=17.10.21;
-    Time=14:13:41;
+    Time=21:16:37;
     Modified=Yes;
-    Version List=[excel];
+    Version List=[[t.d]]];
   }
   PROPERTIES
   {
@@ -46,18 +46,18 @@ OBJECT Codeunit 50152 dictionary
       dlg.OPEN('Exporting data @1@@@@@@@@@@@@@@@@@@@@@@@');
       itemCount := item.COUNT;
 
-      // data
+      // collect data
       CREATE(dict);
       IF item.FINDSET THEN
       REPEAT
         lineNo += 1;
         dlg.UPDATE(1, ROUND(lineNo * 10000 / itemCount, 1));
-        addText(dict, 1, item."No.");
-        addText(dict, 2, item.Description + item."Description 2");
-        addText(dict, 3, FORMAT(item."Unit Price"));
-        addText(dict, 4, FORMAT(item."Gross Weight"));
-        addText(dict, 5, FORMAT(item."Net Weight"));
-        addText(dict, 6, FORMAT(item."Last Date Modified"));
+        addVal(dict, 1, item."No.");
+        addVal(dict, 2, item.Description + item."Description 2");
+        addVal(dict, 3, FORMAT(item."Unit Price"));
+        addVal(dict, 4, FORMAT(item."Gross Weight"));
+        addVal(dict, 5, FORMAT(item."Net Weight"));
+        addVal(dict, 6, FORMAT(item."Last Date Modified"));
         xl.Range('A1').Offset(lineNo, 0).Resize(1, fieldCount).Value  := dict.Items;
         dict.RemoveAll;
       UNTIL item.NEXT = 0;
@@ -68,7 +68,7 @@ OBJECT Codeunit 50152 dictionary
       xl.Columns.AutoFit;
     END;
 
-    PROCEDURE addText@1210001(dict@1210002 : Automation "{420B2830-E718-11CF-893D-00A0C9054228} 1.0:{EE09B103-97E0-11CF-978F-00A02463E06F}:'Microsoft Scripting Runtime'.Dictionary";key@1210000 : Integer;value@1210001 : Text[1024]);
+    PROCEDURE addVal@1210001(dict@1210002 : Automation "{420B2830-E718-11CF-893D-00A0C9054228} 1.0:{EE09B103-97E0-11CF-978F-00A02463E06F}:'Microsoft Scripting Runtime'.Dictionary";key@1210000 : Integer;value@1210001 : Variant);
     BEGIN
       dict.Add(key, value);
     END;
