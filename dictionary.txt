@@ -46,7 +46,7 @@ OBJECT Codeunit 50152 dictionary
       dlg.OPEN('Exporting data @1@@@@@@@@@@@@@@@@@@@@@@@');
       itemCount := item.COUNT;
 
-      // collect data
+      // data
       CREATE(dict);
       IF item.FINDSET THEN
       REPEAT
