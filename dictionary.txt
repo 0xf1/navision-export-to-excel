@@ -1,0 +1,80 @@
+OBJECT Codeunit 50152 dictionary
+{
+  OBJECT-PROPERTIES
+  {
+    Date=17.10.21;
+    Time=14:13:41;
+    Modified=Yes;
+    Version List=[excel];
+  }
+  PROPERTIES
+  {
+    OnRun=BEGIN
+            export;
+          END;
+
+  }
+  CODE
+  {
+
+    PROCEDURE export@1210000();
+    VAR
+      item@1210000 : Record 27;
+      xl@1210002 : Automation "{00020813-0000-0000-C000-000000000046} 1.9:{00024500-0000-0000-C000-000000000046}:'Microsoft Excel 16.0 Object Library'.Application";
+      dlg@1210005 : Dialog;
+      dlgCounter@1210006 : Integer;
+      itemCount@1210007 : Integer;
+      fieldCount@1210009 : Integer;
+      dict@1210008 : Automation "{420B2830-E718-11CF-893D-00A0C9054228} 1.0:{EE09B103-97E0-11CF-978F-00A02463E06F}:'Microsoft Scripting Runtime'.Dictionary";
+      i@1210001 : Integer;
+      val@1210003 : Text[1024];
+      lineNo@1210004 : Integer;
+    BEGIN
+      CREATE(xl, TRUE);
+      xl.Visible:= TRUE;
+      xl.Workbooks.Add;
+
+      // header
+      xl.Range('A1').Value := 'Item No.';
+      xl.Range('B1').Value := 'Description';
+      xl.Range('C1').Value := 'Unit Price';
+      xl.Range('D1').Value := 'Gross Weight';
+      xl.Range('E1').Value := 'Net Weight';
+      xl.Range('F1').Value := 'Last Date Modified';
+      fieldCount := 6;
+
+      dlg.OPEN('Exporting data @1@@@@@@@@@@@@@@@@@@@@@@@');
+      itemCount := item.COUNT;
+
+      // collect data
+      CREATE(dict);
+      IF item.FINDSET THEN
+      REPEAT
+        lineNo += 1;
+        dlg.UPDATE(1, ROUND(lineNo * 10000 / itemCount, 1));
+        addText(dict, 1, item."No.");
+        addText(dict, 2, item.Description + item."Description 2");
+        addText(dict, 3, FORMAT(item."Unit Price"));
+        addText(dict, 4, FORMAT(item."Gross Weight"));
+        addText(dict, 5, FORMAT(item."Net Weight"));
+        addText(dict, 6, FORMAT(item."Last Date Modified"));
+        xl.Range('A1').Offset(lineNo, 0).Resize(1, fieldCount).Value  := dict.Items;
+        dict.RemoveAll;
+      UNTIL item.NEXT = 0;
+
+      // borders, formatting
+      xl.Range('A1').Resize(itemCount+1, fieldCount).Borders.LineStyle := 1;
+      xl.Range('A1').EntireRow.Font.Bold := TRUE;
+      xl.Columns.AutoFit;
+    END;
+
+    PROCEDURE addText@1210001(dict@1210002 : Automation "{420B2830-E718-11CF-893D-00A0C9054228} 1.0:{EE09B103-97E0-11CF-978F-00A02463E06F}:'Microsoft Scripting Runtime'.Dictionary";key@1210000 : Integer;value@1210001 : Text[1024]);
+    BEGIN
+      dict.Add(key, value);
+    END;
+
+    BEGIN
+    END.
+  }
+}
+
